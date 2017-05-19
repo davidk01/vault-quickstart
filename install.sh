@@ -22,10 +22,18 @@ fi
 
 # make sure we actually got it
 hash -r
-vault -v > /dev/null
+if ! (vault -v); then
+  if ! (echo $PATH | grep "${VAULT_INSTALL_DIR}"); then
+    first_path_component="$(echo $PATH | cut -d: -f1)"
+    echo "Vault was installed into a directory that is not in the path."
+    echo "Symlinking it into the first path component: ${first_path_component}."
+    sudo ln -sf "${VAULT_INSTALL_DIR}/vault" "${first_path_component}/vault"
+    hash -r
+  fi
+fi
 
 # set mlock capability so we can run process as non-root user
-sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault)) || true
 
 # configuration directory
 if [[ ! -e "${VAULT_CONFIG_DIR}" ]]; then
