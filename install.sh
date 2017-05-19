@@ -2,6 +2,15 @@
 set -o pipefail
 source ./vars.sh
 
+# we need wget
+if ! (which wget); then
+  (sudo yum install -y wget) || \
+    (sudo apt-get install --yes --force-yes wget) || \
+    echo "Failed to install wget!"
+fi
+# make sure we actually have it
+which wget > /dev/null
+
 # if we do not have it then download and unpack into place
 if ! (vault -v); then
   # grab the zip file for the binary
@@ -12,7 +21,7 @@ if ! (vault -v); then
 fi
 
 # make sure we actually got it
-vault -v &> /dev/null
+vault -v > /dev/null
 
 # set mlock capability so we can run process as non-root user
 sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
