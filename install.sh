@@ -21,6 +21,7 @@ if ! (vault -v); then
 fi
 
 # make sure we actually got it
+hash -r
 vault -v > /dev/null
 
 # set mlock capability so we can run process as non-root user
