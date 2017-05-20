@@ -37,3 +37,14 @@ export VAULT_USER="$(whoami)"
 If you want to use the scripts as a cloud-init script then just cocatenate everything
 together (`cat vars.sh install.sh start.sh init.sh unseal.sh`) and use that as the cloud-init
 script.
+
+# DC/OS
+This repository can also be used as a starting point for running vault as a DC/OS marathon application/service
+
+```
+wget -O vault.json \
+  https://raw.githubusercontent.com/davidk01/vault-quickstart/master/dcos/vault.json
+dcos marathon app add vault.json
+```
+
+The above DC/OS marathon configuration will pull in an archive of this repository and then run using the basic Mesos containerizer. Running things as a docker container is left as an exercise for the reader.
