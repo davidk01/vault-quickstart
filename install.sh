@@ -3,7 +3,7 @@ set -o pipefail
 source ./vars.sh
 
 # make sure we have "${VAULT_USER}"
-if ! (id "${VAULT_USER}); then
+if ! (id "${VAULT_USER}"); then
   useradd -M -r "${VAULT_USER}"
 fi
 
