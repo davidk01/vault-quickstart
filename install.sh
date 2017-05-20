@@ -4,7 +4,7 @@ source ./vars.sh
 
 # make sure we have "${VAULT_USER}"
 if ! (id "${VAULT_USER}"); then
-  useradd -M -r "${VAULT_USER}"
+  sudo useradd -M -r "${VAULT_USER}"
 fi
 
 # we need wget
