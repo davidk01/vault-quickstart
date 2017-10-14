@@ -11,16 +11,24 @@ fi
 if ! (which wget); then
   (sudo yum install -y wget) || \
     (sudo apt-get install --yes --force-yes wget) || \
-    echo "Failed to install wget!"
+    2>&1 echo "Failed to install wget!"
 fi
 # make sure we actually have it
 which wget > /dev/null
+
+# we need unzip
+if ! (which unzip); then
+  (sudo yum install -y unzip) || \
+    (sudo apt-get install --yes --force-yes unzip) || \
+    2>&1 echo "Failed to install unzip!"
+fi
+which unzip > /dev/null
 
 # if we do not have it then download and unpack into place
 if ! (vault -v); then
   # grab the zip file for the binary
   if [[ ! -e "${VAULT_DOWNLOAD_TARGET}" ]]; then
-    wget -O "${VAULT_DOWNLOAD_TARGET}" "${VAULT_URL}"
+    wget -q -O "${VAULT_DOWNLOAD_TARGET}" "${VAULT_URL}"
   fi
   unzip -d "${VAULT_INSTALL_DIR}" "${VAULT_DOWNLOAD_TARGET}"
 fi
@@ -28,8 +36,8 @@ fi
 # make sure we actually got it
 hash -r
 if ! (vault -v); then
-  if ! (echo $PATH | grep "${VAULT_INSTALL_DIR}"); then
-    first_path_component="$(echo $PATH | cut -d: -f1)"
+  if ! (echo "${PATH}" | grep "${VAULT_INSTALL_DIR}"); then
+    first_path_component="$(echo "${PATH}" | cut -d: -f1)"
     echo "Vault was installed into a directory that is not in the path."
     echo "Symlinking it into the first path component: ${first_path_component}."
     sudo ln -sf "${VAULT_INSTALL_DIR}/vault" "${first_path_component}/vault"
@@ -38,7 +46,7 @@ if ! (vault -v); then
 fi
 
 # set mlock capability so we can run process as non-root user
-sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault)) || true
+sudo setcap cap_ipc_lock=+ep "$(readlink -f "$(which vault)")" || true
 
 # configuration directory
 if [[ ! -e "${VAULT_CONFIG_DIR}" ]]; then
